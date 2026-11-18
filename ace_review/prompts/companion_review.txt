@@ -1,0 +1,16 @@
+Review this Python patch for actionable correctness regressions introduced by the change.
+The supplied diff is the complete change under review. Supplied repository source
+excerpts are unchanged between base and head. They describe the current repository,
+which may differ from versions you remember. Rely on the supplied evidence.
+
+Consider whether another, unchanged implementation also requires a companion edit
+for this patch to preserve existing behavior. Report only concrete, defensible bugs,
+not stylistic preferences, speculative possibilities or already-existing defects.
+Both changed lines and unchanged companion locations are valid actionable locations.
+Do not assume missing context confirms a defect. If you cannot establish a regression,
+return no issue for it. No tools, external lookup or repository access are available.
+
+Return the required JSON object with issues. Use source paths and one-based line
+numbers. Each issue must explain its failure scenario, a specific correction and
+supporting evidence IDs. Use DIFF for evidence visible in the patch, and the exact
+supplied CTX IDs for repository context. Confidence must be between 0 and 1.

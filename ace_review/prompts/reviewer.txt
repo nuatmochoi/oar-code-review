@@ -1,0 +1,13 @@
+Review the proposed change for concrete defects.
+
+Use only the diff and context evidence included in this request. Do not call or
+attempt to call shell, browser, web-search, file-search, or any other tool.
+
+Report at most five independent issues. Do not report style or maintainability
+suggestions unless they cause incorrect behavior, security risk, performance
+regression, build failure, or test failure.
+
+Every issue must contain a changed-line location, a falsifiable defect claim,
+evidence IDs from the diff or supplied context, an execution scenario, and a
+concise correction. If no actionable defect is sufficiently supported, return
+{"issues": []}. Return JSON only.

@@ -1,0 +1,47 @@
+{
+  "B0": {
+    "counts": {
+      "candidate_count": 44,
+      "golden_tp_count": 352,
+      "matched_count": 37,
+      "matched_tp_count": 33,
+      "unmatched_count": 7,
+      "unmatched_tp_count": 6,
+      "unmatched_fp_count": 1,
+      "golden_covered_count": 39
+    },
+    "grounded_F1": 0.19710544452102,
+    "augmented_F1": 0.22017312758750468,
+    "total_FP": 5
+  },
+  "B1": {
+    "counts": {
+      "candidate_count": 50,
+      "golden_tp_count": 352,
+      "matched_count": 39,
+      "matched_tp_count": 35,
+      "unmatched_count": 11,
+      "unmatched_tp_count": 9,
+      "unmatched_fp_count": 2,
+      "golden_covered_count": 42
+    },
+    "grounded_F1": 0.2106318956870612,
+    "augmented_F1": 0.24346316588911793,
+    "total_FP": 6
+  },
+  "B2": {
+    "counts": {
+      "candidate_count": 39,
+      "golden_tp_count": 352,
+      "matched_count": 32,
+      "matched_tp_count": 29,
+      "unmatched_count": 7,
+      "unmatched_tp_count": 6,
+      "unmatched_fp_count": 1,
+      "golden_covered_count": 35
+    },
+    "grounded_F1": 0.17920197740112995,
+    "augmented_F1": 0.20312831764456082,
+    "total_FP": 4
+  }
+}

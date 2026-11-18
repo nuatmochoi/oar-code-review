@@ -1,0 +1,48 @@
+{
+  "dataset_snapshots": {
+    "aacr_bench": "68a569759289a83654a59d06db2a72910edf0a4a",
+    "go_lsp_artifact": "8f59364e58de906e4ef55c03d8b6eb798fcb19af"
+  },
+  "conditions": [
+    "diff",
+    "random",
+    "bm25",
+    "neighbor",
+    "lsp",
+    "dataflow",
+    "buildtest",
+    "lsp_df",
+    "lsp_buildtest",
+    "dataflow_buildtest",
+    "structured_all",
+    "stuffed_all",
+    "adaptive",
+    "oracle"
+  ],
+  "token_budgets": [2048, 4096, 8192],
+  "natural_size": true,
+  "review_runs": 3,
+  "max_issues": 5,
+  "repository_split": true,
+  "factorial_factors": ["lsp", "dataflow", "buildtest"],
+  "strict_confirmatory_requirements": {
+    "model_tools_disabled": true,
+    "successful_tool_traces_retained": true,
+    "randomized_arm_order": true,
+    "identical_evidence_hashes_verified": true,
+    "token_matched_secondary_analysis": true
+  },
+  "build_test": {
+    "base_revision": "merge_base",
+    "patch_revision": "head_commit",
+    "repeat": 2,
+    "timeout_seconds": 600
+  },
+  "selector_utility": {
+    "true_positive": 1.0,
+    "false_positive": -2.0,
+    "suppression": -0.1,
+    "token": -0.00001,
+    "latency_second": -0.001
+  }
+}

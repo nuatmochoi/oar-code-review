@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ace-review/context-pair.schema.json",
+  "title": "ACE Review context-necessity pair",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "family_id", "repository", "language", "origin", "split",
+    "stratum", "target", "worlds", "companion_paths", "gold", "witness"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "family_id": {"type": "string", "minLength": 1},
+    "repository": {"type": "string", "minLength": 1},
+    "language": {"type": "string", "minLength": 1},
+    "origin": {"enum": ["natural", "derived"]},
+    "split": {"enum": ["development", "validation", "test"]},
+    "stratum": {"enum": ["static_decidable", "runtime_required", "unresolved"]},
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changed_files", "actionable_span"],
+      "properties": {
+        "changed_files": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "actionable_span": {"$ref": "#/$defs/span"}
+      }
+    },
+    "worlds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["safe", "unsafe"],
+      "properties": {
+        "safe": {"$ref": "#/$defs/world"},
+        "unsafe": {"$ref": "#/$defs/world"}
+      }
+    },
+    "companion_paths": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "gold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mechanism", "required_evidence_nodes", "oracle_nodes", "oracle_edges", "oracle_paths"],
+      "properties": {
+        "mechanism": {"type": "string", "minLength": 1},
+        "required_evidence_nodes": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+        "oracle_nodes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/node"}},
+        "oracle_edges": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/edge"}},
+        "oracle_paths": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/path"}}
+      }
+    },
+    "witness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["argv", "timeout_seconds", "exit_codes"],
+      "properties": {
+        "argv": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "cwd": {"type": "string", "default": "."},
+        "timeout_seconds": {"type": "number", "exclusiveMinimum": 0, "maximum": 300},
+        "exit_codes": {
+          "type": "object",
+          "additionalProperties": {"type": "integer"},
+          "required": ["pass", "target_failure"]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "span": {
+      "type": "object", "additionalProperties": false,
+      "required": ["file", "start_line", "end_line"],
+      "properties": {
+        "file": {"type": "string", "minLength": 1},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1}
+      }
+    },
+    "world": {
+      "type": "object", "additionalProperties": false,
+      "required": ["base_snapshot", "head_snapshot", "diff", "expected"],
+      "properties": {
+        "base_snapshot": {"type": "string", "minLength": 1},
+        "head_snapshot": {"type": "string", "minLength": 1},
+        "diff": {"type": "string", "minLength": 1},
+        "expected": {
+          "type": "object", "additionalProperties": false,
+          "required": ["base", "head"],
+          "properties": {"base": {"type": "string"}, "head": {"type": "string"}}
+        }
+      }
+    },
+    "node": {
+      "type": "object", "additionalProperties": true,
+      "required": ["id", "role", "file", "start_line", "end_line"],
+      "properties": {
+        "id": {"type": "string"}, "role": {"type": "string"}, "file": {"type": "string"},
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "symbols": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "edge": {
+      "type": "object", "additionalProperties": true,
+      "required": ["source", "target", "type"],
+      "properties": {"source": {"type": "string"}, "target": {"type": "string"}, "type": {"type": "string"}}
+    },
+    "path": {
+      "type": "object", "additionalProperties": false,
+      "required": ["nodes", "edge_types"],
+      "properties": {
+        "nodes": {"type": "array", "minItems": 2, "items": {"type": "string"}},
+        "edge_types": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+      }
+    }
+  }
+}

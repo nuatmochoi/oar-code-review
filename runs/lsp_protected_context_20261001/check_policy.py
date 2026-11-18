@@ -1,0 +1,16 @@
+import ast,json,sys
+from pathlib import Path
+R=Path(__file__).resolve().parent;sys.path.insert(0,str(R));import experiment as ex
+p=ex.policy;fixture=R/'policy_fixture';fixture.mkdir(exist_ok=True);(fixture/'pyrightconfig.json').write_text('{"typeCheckingMode":"off","pythonVersion":"3.11"}')
+s='class A:\n    def run(self):\n        return 1\n\nclass B:\n    def run(self):\n        return 2\n\ndef use_a(a: A):\n    return a.run()\n\ndef use_b(b: B):\n    return b.run()\n';(fixture/'api.py').write_text(s);vv={'head':{'api.py':s},'base':{'api.py':s}};c=ex.Corpus(vv,{v:{'nodes':{},'edges':[]} for v in vv},'');r=p.ref.old.Bindings(c,vv['head']);client=p.Client(fixture)
+try:line,char=p.declaration_position(r,'api.py','A.run');raw=client.references('api.py',line,char);hits,exc=p.locations(c,client,raw)
+finally:client.close()
+checks={'native_references_supported':bool(client.initialization['capabilities'].get('referencesProvider')),'correct_caller_reference':any(c.units[k].symbol=='use_a' for k,l in hits),'unrelated_same_name_excluded':not any(c.units[k].symbol=='use_b' for k,l in hits)}
+# Missing large function must receive signature/edited branch/parameter constructor without changing protected B source.
+noise='\n'.join('def noise_'+str(i)+'():\n'+''.join(f'    x{j} = {j}\n' for j in range(12))+'    return 0\n' for i in range(20));giant='def giant(value, *, cls=int):\n'+''.join(f'    unused_{i} = {i}\n' for i in range(180))+'    if value:\n        value += 1\n    return cls(value)\n\ndef entry():\n    return giant(7, cls=str)\n';s=giant+noise;old=s.replace('value += 1','value += 0');(fixture/'api.py').write_text(s);vv={'head':{'api.py':s},'base':{'api.py':old}};dd='--- a/api.py\n+++ b/api.py\n@@ -183 +183 @@\n-        value += 0\n+        value += 1\n';c=ex.Corpus(vv,{v:{'nodes':{},'edges':[]} for v in vv},dd);r=p.ref.old.Bindings(c,vv['head']);st=p.EvidenceState(c)
+for k,u in c.units.items():
+ if u.symbol.startswith('noise_'):st.add([k],'L1',1450)
+entry=r.unit('api.py','entry')[0];st.add([entry],'L1',1600);baseline={'B':st.render(),'B_audit':{'state':st.audit(),'jumps':[]}};client=p.Client(fixture)
+try:new,a,o=p.packet(c,vv,{'scope':'entry() must respect cls','diff':dd},r,client,baseline,'F')
+finally:client.close()
+checks.update({'protected_whole_source_unchanged':all(new.lines[k]==st.lines[k] for k in a['protected_ids']),'native_reference_source_used':any(x['reason']=='native_reference_caller' for x in a['additions']) or entry in a['protected_ids'],'missing_branch_added':'value += 1' in new.render(),'parameter_constructor_added':'return cls(value)' in new.render(),'partial_marked':'PARTIAL ANCHORS; omitted code unknown' in new.render(),'only_unprotected_evicted':not bool(set(a['evicted_ids'])&set(a['protected_ids'])),'caps':new.tokens<=1600 and ex.token_count(o)<=400 and len(a['extra_navigation'])<=3,'no_native_error':not any(x['error'] for x in a['extra_navigation'])});(R/'native_tests.json').write_text(json.dumps({'same_name_reference_result':raw,'augmentation_audit':a,'source':new.render(),'trace':client.trace},indent=2));result={'checks':checks,'passed':all(checks.values())};(R/'policy_tests.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2));assert result['passed']
